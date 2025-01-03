@@ -17,6 +17,7 @@ import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
 import { HttpTestingController } from '@angular/common/http/testing';
+import { NgZone } from '@angular/core';
 
 
 describe('LoginComponent', () => {
@@ -25,6 +26,8 @@ describe('LoginComponent', () => {
   let authServiceMock: any;
   let sessionServiceMock: any;
   let router: Router;
+  let ngZone: NgZone;
+
   beforeEach(async () => {
 
     authServiceMock = {
@@ -67,6 +70,7 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
+    ngZone = TestBed.inject(NgZone);
     fixture.detectChanges();
 
   });
@@ -94,8 +98,9 @@ describe('LoginComponent', () => {
 
   
     component.form.setValue(loginRequest);
-
+    ngZone.run(() => {
     component.submit();
+    });
 
     expect(authServiceMock.login).toHaveBeenCalledWith(loginRequest);
    // expect(sessionServiceMock.logIn).toHaveBeenCalledWith(sessionResponse); 
