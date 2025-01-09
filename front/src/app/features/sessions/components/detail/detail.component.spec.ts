@@ -9,6 +9,9 @@ import { SessionService } from '../../../../services/session.service';
 import { DetailComponent } from './detail.component';
 import { SessionApiService } from '../../services/session-api.service';
 import { of } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { NgZone } from '@angular/core';
 
 
 describe('DetailComponent', () => {
@@ -16,6 +19,8 @@ describe('DetailComponent', () => {
   let fixture: ComponentFixture<DetailComponent>; 
   let service: SessionService;
   let snackBarMock: jest.Mocked<MatSnackBar>;
+  let ngZone: NgZone;
+
   
 
   const mockSessionService = {
@@ -50,7 +55,9 @@ describe('DetailComponent', () => {
         RouterTestingModule,
         HttpClientModule,
         MatSnackBarModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        MatCardModule,
+        MatIconModule,
       ],
       declarations: [DetailComponent], 
       providers: [
@@ -63,6 +70,7 @@ describe('DetailComponent', () => {
       service = TestBed.inject(SessionService);
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
+    ngZone = TestBed.inject(NgZone);
     fixture.detectChanges();
   });
 
@@ -73,10 +81,10 @@ describe('DetailComponent', () => {
   // test unitaire Suppression d’une session
   it('should delete a session', () => {
     component.sessionId = '1';
-    component.delete();
-    
+    ngZone.run(() => {
+      component.delete();
+    });
     expect(snackBarMock.open).toHaveBeenCalledWith('Session deleted !', 'Close',  { duration: 3000 });
-
   });
 
 });

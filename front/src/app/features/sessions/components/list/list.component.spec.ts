@@ -9,6 +9,10 @@ import { ListComponent } from './list.component';
 import { of } from 'rxjs';
 import { SessionApiService } from '../../services/session-api.service';
 import { By } from '@angular/platform-browser';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterModule } from '@angular/router';
+
+
 
 describe('ListComponent', () => {
   let component: ListComponent;
@@ -32,7 +36,7 @@ describe('ListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ListComponent],
-      imports: [HttpClientModule, MatCardModule, MatIconModule],
+      imports: [HttpClientModule, MatCardModule, MatIconModule, MatButtonModule, RouterModule.forRoot([])],
       providers: [{ provide: SessionService, useValue: mockSessionService },
         { provide: SessionApiService, useValue: mockSessionApiService },
 

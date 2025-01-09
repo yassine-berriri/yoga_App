@@ -15,6 +15,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { NgZone } from '@angular/core';
+
 
 
 describe('RegisterComponent', () => {
@@ -23,6 +25,8 @@ describe('RegisterComponent', () => {
   let authServiceMock: any;
   let router: Router;
   let httpTestingController: HttpTestingController;
+  let ngZone: NgZone;
+
 
 
   beforeEach(async () => {
@@ -55,6 +59,8 @@ describe('RegisterComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     router = TestBed.inject(Router);
+    ngZone = TestBed.inject(NgZone);
+
     httpTestingController = TestBed.inject(HttpTestingController); 
   });
 
@@ -69,7 +75,9 @@ describe('RegisterComponent', () => {
     //const navigateSpy = jest.spyOn(router, 'navigate');
 
     component.form.setValue(registerRequest);
-    component.submit();
+    ngZone.run(() => {
+      component.submit();
+      });
 
     expect(authServiceMock.register).toHaveBeenCalledWith(registerRequest);
     //expect(navigateSpy).toHaveBeenCalledWith(['/login']);
@@ -111,8 +119,9 @@ describe('RegisterComponent', () => {
             expect(component.form.invalid).toBe(false);
 
             //const navigateSpy = jest.spyOn(router, 'navigate');
-
-            component.submit();
+            ngZone.run(() => {
+              component.submit();
+              });
             fixture.detectChanges();
       
             expect(component.onError).toBe(true);
@@ -131,13 +140,15 @@ describe('RegisterComponent with real service', () => {
   let fixture: ComponentFixture<RegisterComponent>;
   let router: Router;
   let httpTestingController: HttpTestingController;
+  let ngZone: NgZone;
+
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
-      providers: [AuthService], // Utiliser le vrai service
+      providers: [AuthService], 
       imports: [
-        HttpClientTestingModule, // Nécessaire pour intercepter les requêtes HTTP
+        HttpClientTestingModule, 
         RouterTestingModule.withRoutes([{ path: 'login', redirectTo: '' }]),
         ReactiveFormsModule,
         MatCardModule,
@@ -152,6 +163,8 @@ describe('RegisterComponent with real service', () => {
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
     httpTestingController = TestBed.inject(HttpTestingController); // Injecter le contrôleur HTTP
+    ngZone = TestBed.inject(NgZone);
+
   });
   // test integration invalid 
   it('should handle invalid password error and set onError to true', () => {
@@ -164,7 +177,9 @@ describe('RegisterComponent with real service', () => {
 
     const navigateSpy = jest.spyOn(router, 'navigate');
     component.form.setValue(registerRequest);
-    component.submit();
+    ngZone.run(() => {
+      component.submit();
+      });
 
     const req = httpTestingController.expectOne('api/auth/register'); 
     expect(req.request.method).toBe('POST');
@@ -187,8 +202,9 @@ describe('RegisterComponent with real service', () => {
   
       const navigateSpy = jest.spyOn(router, 'navigate');
       component.form.setValue(registerRequest);
-      component.submit();
-  
+      ngZone.run(() => {
+        component.submit();
+        });  
       const req = httpTestingController.expectOne('api/auth/register'); 
       expect(req.request.method).toBe('POST');
       req.flush({message:"User registered successfully!"}, { status: 200, statusText: 'OK' });
@@ -210,8 +226,9 @@ describe('RegisterComponent with real service', () => {
   
       const navigateSpy = jest.spyOn(router, 'navigate');
       component.form.setValue(registerRequest);
-      component.submit();
-  
+      ngZone.run(() => {
+        component.submit();
+      });  
       const req = httpTestingController.expectOne('api/auth/register'); 
       expect(req.request.method).toBe('POST');
       req.flush({message:"Error: Email is already taken!"}, { status: 400, statusText: 'Bad Request' });

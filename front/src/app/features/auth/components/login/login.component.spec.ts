@@ -115,15 +115,14 @@ describe('LoginComponent', () => {
     authServiceMock.login.mockReturnValue(throwError(() => errorResponse));
   
     component.form.setValue(loginRequest);
-  
-    component.submit();
-  
-    expect(authServiceMock.login).toHaveBeenCalledWith(loginRequest);
-  
+    ngZone.run(() => {
+      component.submit();
+    });
+    
     expect(component.onError).toBe(true);
     });
     
-    //integration test
+    //test unitaire
     it('should handle errors on failed login attempt', () => {
       const loginRequest = { email: "wrong@studio.com", password: "wrongpassword" };
     
@@ -132,7 +131,9 @@ describe('LoginComponent', () => {
     
       component.form.setValue(loginRequest);
     
-      component.submit();
+      ngZone.run(() => {
+        component.submit();
+      });
       fixture.detectChanges();
 
       expect(authServiceMock.login).toHaveBeenCalledWith(loginRequest);
@@ -173,16 +174,13 @@ describe('LoginComponent', () => {
         component.form.setValue(loginRequest);
         const navigateSpy = jest.spyOn(router, 'navigate');
 
-        component.submit();
+        ngZone.run(() => {
+          component.submit();
+        });
         fixture.detectChanges();
       
         expect(component.form.valid).toBe(true);
       
         expect(navigateSpy).toHaveBeenCalledWith(['/sessions']);
       });
-      
-      
-
-
-
 });
