@@ -12,6 +12,8 @@ import { of } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { NgZone } from '@angular/core';
+import { Session } from '../../interfaces/session.interface';
+import { Teacher } from 'src/app/interfaces/teacher.interface';
 
 
 describe('DetailComponent', () => {
@@ -20,6 +22,7 @@ describe('DetailComponent', () => {
   let service: SessionService;
   let snackBarMock: jest.Mocked<MatSnackBar>;
   let ngZone: NgZone;
+  let sessionApiService: SessionApiService;
 
   
 
@@ -41,6 +44,14 @@ describe('DetailComponent', () => {
     })),
   };
 
+  const mockSessionWithUser: Session = {
+    id: 1,
+    name: 'session',
+    description: 'session',
+    date: new Date(),
+    teacher_id: 1,
+    users: [1]
+  }
 
 
   beforeEach(async () => {
@@ -72,6 +83,8 @@ describe('DetailComponent', () => {
     component = fixture.componentInstance;
     ngZone = TestBed.inject(NgZone);
     fixture.detectChanges();
+    sessionApiService = TestBed.inject(SessionApiService );
+
   });
 
   it('should create', () => {
@@ -86,6 +99,28 @@ describe('DetailComponent', () => {
     });
     expect(snackBarMock.open).toHaveBeenCalledWith('Session deleted !', 'Close',  { duration: 3000 });
   });
+
+
+it('ngOnInit() should fetch session with user and update component properties', () => {
+    const exitPageSpy = jest.spyOn(component as any, 'fetchSession');
+    jest.spyOn(sessionApiService, 'detail').mockReturnValue(of(mockSessionWithUser));
+
+    component.ngOnInit();
+
+    expect(exitPageSpy).toBeCalledTimes(1);
+    expect(component.session).toEqual(mockSessionWithUser);
+    expect(component.isParticipate).toEqual(true);
+  });
+
+ // unit test
+  it('back should call window.history.back', () => {
+    const windowHistoryBackSpy = jest.spyOn(window.history, 'back');
+
+    component.back();
+
+    expect(windowHistoryBackSpy).toBeCalledTimes(1);
+  });
+
 
 });
 

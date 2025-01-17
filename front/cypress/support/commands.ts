@@ -41,3 +41,15 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("adminLogin", () => {
+    cy.visit('/login')
+
+    cy.fixture('adminLogin').then(login => {
+        cy.intercept('POST', '/api/auth/login', login)
+        cy.get('input[formControlName=email]').type(login.username)
+        cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+    })
+  
+    cy.url().should('include', '/sessions')
+})

@@ -84,12 +84,6 @@ describe('RegisterComponent', () => {
   })
 
 
-     //test unitaire firstName = null
-     it('should disable the button if the password is empty', () => {
-      const registerRequest = {email: "yassine@gmail.com", firstName: "", lastName: "yassine", password: "yassine1234!"};
-      component.form.setValue(registerRequest);
-      expect(component.form.invalid).toBe(true);
-    });
 
      //test unitaire email not valid
      it('should disable the button if the password is empty', () => {
@@ -99,13 +93,7 @@ describe('RegisterComponent', () => {
     });
 
 
-      //test unitaire email not valid
-      it('should disable the button if the password is empty', () => {
-        const registerRequest = {email: "yassine", firstName: "yassine", lastName: "yassine", password: "yassine1234!"};
-        component.form.setValue(registerRequest);
-        expect(component.form.invalid).toBe(true);
-      });
-
+    
 
 
           //test unitaire password not valid

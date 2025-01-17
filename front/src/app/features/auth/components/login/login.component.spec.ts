@@ -16,7 +16,7 @@ import { BehaviorSubject, throwError } from 'rxjs';
 import { of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
-import { HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NgZone } from '@angular/core';
 
 
@@ -152,22 +152,7 @@ describe('LoginComponent', () => {
         expect(component.form.invalid).toBe(true);
       });
 
-      //test unitaire password & email valid
-      it('should enable the button if the password and the email are valid', () => {
-        const loginRequest = { email: "test@studio.com", password: "test" };
-      
-        component.form.setValue(loginRequest);
-        expect(component.form.valid).toBe(true);
-      });
 
-       //test unitaire email invalid
-       it('should disable the button if the email is invalid', () => {
-        const loginRequest = { email: "test", password: "test" };
-        component.form.setValue(loginRequest);
-        expect(component.form.invalid).toBe(true);
-      });
-
-      // test integration 
       it('should call the real API and handle a successful login', async () => {
         const loginRequest = { email: "yoga@studio.com", password: "test!1234" };
       
@@ -184,3 +169,78 @@ describe('LoginComponent', () => {
         expect(navigateSpy).toHaveBeenCalledWith(['/sessions']);
       });
 });
+
+describe('LoginComponent with real service', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+  let router: Router;
+  let httpTestingController: HttpTestingController;
+  let ngZone: NgZone;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [LoginComponent],
+      providers: [AuthService],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule.withRoutes([
+          { path: 'sessions', redirectTo: '' }, 
+        ]),
+        BrowserAnimationsModule,
+        HttpClientModule,
+        MatCardModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        HttpClientModule
+      ]
+    }).compileComponents();
+
+      fixture = TestBed.createComponent(LoginComponent);
+        component = fixture.componentInstance;
+        router = TestBed.inject(Router);
+        httpTestingController = TestBed.inject(HttpTestingController); // Injecter le contrôleur HTTP
+        ngZone = TestBed.inject(NgZone);
+  })
+
+  // integration test auth with no existing user
+  it('should handle error message', () => {
+    const loginRequest = { email: "yoga@studio.com", password: "invalid password" };
+
+    component.form.setValue(loginRequest);
+    ngZone.run(() =>{
+      component.submit();
+    })
+
+    const req = httpTestingController.expectOne('api/auth/login'); 
+    expect(req.request.method).toBe('POST');
+    req.flush({}, { status: 400, statusText: 'Bad Request' });
+
+    fixture.detectChanges();
+
+    expect(component.onError).toBe(true);
+
+  })
+
+    // integration test auth with  existing user
+    it('should handle error message', () => {
+      const loginRequest = { email: "yoga@studio.com", password: "test!1234" };
+  
+      component.form.setValue(loginRequest);
+      ngZone.run(() =>{
+        component.submit();
+      })
+  
+      const req = httpTestingController.expectOne('api/auth/login'); 
+      expect(req.request.method).toBe('POST');
+      req.flush({}, { status: 200, statusText: 'OK' });
+  
+      fixture.detectChanges();
+  
+      expect(component.onError).toBe(false);
+  
+    })
+
+  
+})

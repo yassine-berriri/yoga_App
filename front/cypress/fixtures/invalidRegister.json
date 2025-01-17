@@ -1,0 +1,8 @@
+{
+    "id": 2,
+    "email": "without email",
+    "firstName": "without email",
+    "lastName": "without email",
+    "password": "without email",	
+    "admin": false
+}

@@ -28,7 +28,7 @@ describe('FormComponent', () => {
   let router: Router;
   let ngZone: NgZone;
 
-  const mockSessionService = {
+  let mockSessionService = {
     sessionInformation: {
       admin: true
     }
@@ -125,6 +125,57 @@ describe('FormComponent', () => {
     }
 
   });
+
+  // test unitaire should redirect to route sessions if user is not admin
+  it('ngOnInit() should redirect to route sessions if user is not admin', () => {
+    mockSessionService.sessionInformation.admin = false;
+
+    const routerNavigateSpy = jest.spyOn(router,"navigate");
+
+    ngZone.run(() => {
+      component.ngOnInit();
+    });
+
+    expect(routerNavigateSpy).toBeCalledWith(['/sessions']);
+  });
+
+  it ('should init valid form if the user is admin and route include update', () => {
+    mockSessionService.sessionInformation.admin = true;
+    jest.spyOn(router, 'url', 'get').mockReturnValueOnce('update');
+
+    component.ngOnInit();
+
+    expect(component.onUpdate).toBeTruthy();
+
+  })
+
+  // test unitaire session updated
+  it('should update session', () => {
+    const sessionForm = {name: 'Yoga Basics', date: '2024-01-01', teacher_id: 1,  description: 'Learn the basics of Yoga.',};
+    mockSessionService.sessionInformation.admin = true;
+    jest.spyOn(router, 'url', 'get').mockReturnValueOnce('update');
+    component.sessionForm?.setValue(sessionForm);
+    component.onUpdate = true;
+    
+
+    ngZone.run(() => {
+      component.ngOnInit();
+      component.submit();
+    });
+
+    expect(snackBarMock.open).toHaveBeenCalledWith('Session updated !', 'Close',  { duration: 3000 });
+  });
+
+  // test unitaire should display error when form is invalid  
+  it('should display error when form is invalid', () => {
+    const sessionForm = {name: '', date: '2024-01-01', teacher_id: 1,  description: 'Learn the basics of Yoga.'};
+    component.sessionForm?.setValue(sessionForm);
+
+    expect(component.sessionForm?.invalid).toBeTruthy();  
+
+  });
+
+
 
   
 
