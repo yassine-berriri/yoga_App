@@ -1,0 +1,22 @@
+[
+    {
+        "id": 2,
+        "name": "szdzd",
+        "date": "2024-12-10T00:00:00.000+00:00",
+        "teacher_id": 2,
+        "description": "zqd",
+        "users": [],
+        "createdAt": "2024-12-29T12:11:28",
+        "updatedAt": "2024-12-29T12:11:28"
+    },
+    {
+        "id": 3,
+        "name": "RFRRQG",
+        "date": "2024-12-04T00:00:00.000+00:00",
+        "teacher_id": 2,
+        "description": "RQG",
+        "users": [],
+        "createdAt": "2024-12-29T20:35:07",
+        "updatedAt": "2024-12-29T20:35:07"
+    }
+]

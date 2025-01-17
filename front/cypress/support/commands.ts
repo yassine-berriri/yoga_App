@@ -53,3 +53,15 @@ Cypress.Commands.add("adminLogin", () => {
   
     cy.url().should('include', '/sessions')
 })
+
+Cypress.Commands.add("login", () => {
+    cy.visit('/login')
+
+    cy.fixture('login').then(login => {
+        cy.intercept('POST', '/api/auth/login', login)
+        cy.get('input[formControlName=email]').type(login.username)
+        cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+    })
+
+    cy.url().should('include', '/sessions')
+})
