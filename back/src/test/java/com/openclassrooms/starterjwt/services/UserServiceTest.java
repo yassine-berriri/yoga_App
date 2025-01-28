@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
-@Tag("UserServiceTests")
+@Tag("UserService Unit tests")
 @SpringBootTest
 public class UserServiceTest {
 
