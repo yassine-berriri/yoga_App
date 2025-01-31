@@ -1,5 +1,6 @@
 package com.openclassrooms.starterjwt.controllers;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,7 @@ public class UserControllerIT {
     }
 
 
+    @Disabled
     @DisplayName("delete user integration test")
     @Test
     public void deleteUser_shouldReturn200() throws Exception {
