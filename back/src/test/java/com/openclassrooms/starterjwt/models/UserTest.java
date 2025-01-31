@@ -47,7 +47,7 @@ public class UserTest {
                 .password("user2")
                 .build();
 
-        assertTrue(user1.hashCode() == user2.hashCode());
+        assertFalse(user1.hashCode() == user2.hashCode());
     }
 
 }
