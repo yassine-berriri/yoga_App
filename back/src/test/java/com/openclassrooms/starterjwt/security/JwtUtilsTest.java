@@ -2,6 +2,7 @@ package com.openclassrooms.starterjwt.security;
 
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("JwtUtils unit tests")
 @SpringBootTest
 public class JwtUtilsTest {
 
@@ -33,7 +35,7 @@ public class JwtUtilsTest {
     @DisplayName("validateJwtToken valid test")
     @Test
     public void validateJwtToken_shouldReturnTrue_whenValidToken() {
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("test@gmail.com","password");
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("yoga@studio.com","test!1234");
         Authentication authentication = authManager.authenticate(authRequest);
 
         assertTrue(jwtUtilsUnderTest.validateJwtToken(jwtUtilsUnderTest.generateJwtToken(authentication)));

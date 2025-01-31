@@ -27,7 +27,7 @@ public class UserControllerIT {
     @DisplayName("findById valid integration test")
     @Test
     public void findById_shouldReturn200() throws Exception {
-        this.mockMvc.perform(get("/api/user/1").with(SecurityMockMvcRequestPostProcessors.jwt()))
+        this.mockMvc.perform(get("/api/user/12").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk());
     }
 

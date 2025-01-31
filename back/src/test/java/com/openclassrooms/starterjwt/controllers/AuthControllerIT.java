@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,7 +72,9 @@ public class AuthControllerIT {
     @DisplayName("register Valid integration test")
     @Test
     public void register_shouldReturn200() throws Exception {
-        signupRequest.setEmail("toto99@gmail.com");
+        String uniqueEmail = "user" + UUID.randomUUID().toString() + "@gmail.com";
+
+        signupRequest.setEmail(uniqueEmail);
         signupRequest.setFirstName("toto99");
         signupRequest.setLastName("toto");
         signupRequest.setPassword("test1234885!");
