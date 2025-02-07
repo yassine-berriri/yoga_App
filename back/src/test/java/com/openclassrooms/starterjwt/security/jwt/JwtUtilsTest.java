@@ -1,4 +1,4 @@
-package com.openclassrooms.starterjwt.security;
+package com.openclassrooms.starterjwt.security.jwt;
 
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
