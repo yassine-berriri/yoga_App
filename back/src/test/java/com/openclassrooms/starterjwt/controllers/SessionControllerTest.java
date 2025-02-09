@@ -25,7 +25,7 @@ import java.util.Date;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class SessionControllerIT {
+public class SessionControllerTest {
 
     @Autowired
     MockMvc mockMvc;

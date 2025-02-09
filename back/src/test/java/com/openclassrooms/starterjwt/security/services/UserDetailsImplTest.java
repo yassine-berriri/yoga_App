@@ -126,4 +126,7 @@ public class UserDetailsImplTest {
 
         assertTrue(userDetails.equals(sameIdUserDetails));
     }
+
+
+
 }

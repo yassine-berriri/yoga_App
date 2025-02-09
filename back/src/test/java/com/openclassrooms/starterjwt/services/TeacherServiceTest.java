@@ -1,7 +1,6 @@
 package com.openclassrooms.starterjwt.services;
 
 import com.openclassrooms.starterjwt.models.Teacher;
-import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Tag("TeacherService Unit Tests")
 @SpringBootTest
@@ -27,16 +27,14 @@ public class TeacherServiceTest {
     @Mock
     private TeacherRepository teacherRepository;
 
-
-    Teacher teacherMock;
-
-    List<Teacher> teachersListMock;
+    private Teacher teacherMock;
+    private List<Teacher> teachersListMock;
 
     @BeforeEach
     public void setup() {
         teacherServiceUnderTest = new TeacherService(teacherRepository);
 
-        teacherMock = teacherMock.builder()
+        teacherMock = Teacher.builder()
                 .id(1L)
                 .lastName("teacher")
                 .firstName("teacher")
@@ -48,9 +46,9 @@ public class TeacherServiceTest {
         teachersListMock.add(teacherMock);
     }
 
-    @DisplayName("findAll valid test")
+    @DisplayName("findAll valid test - should return all teachers")
     @Test
-    public void findAll_shouldFindAllTeachers() {
+    public void findAll_shouldReturnAllTeachers() {
         // Arrange
         when(teacherRepository.findAll()).thenReturn(teachersListMock);
 
@@ -61,9 +59,10 @@ public class TeacherServiceTest {
         assertThat(result).isEqualTo(teachersListMock);
     }
 
-    @DisplayName("findTeacherById valid test")
+
+    @DisplayName("findById valid test - should find teacher given valid ID")
     @Test
-    public void findById_shouldFindTeacher_GivenId() {
+    public void findById_shouldFindTeacher_givenValidId() {
         // Arrange
         Long id = 1L;
         when(teacherRepository.findById(id)).thenReturn(Optional.of(teacherMock));
@@ -75,21 +74,32 @@ public class TeacherServiceTest {
         assertThat(result).isEqualTo(teacherMock);
     }
 
-    @DisplayName("findTeacherById inValid test")
+    @DisplayName("findById invalid test - should return null when teacher not found")
     @Test
-    public void findById_shouldReturnNull_GivenId() {
-
+    public void findById_shouldReturnNull_whenTeacherNotFound() {
         // Arrange
-        Long id = 1L;
+        Long id = 99L;
         when(teacherRepository.findById(id)).thenReturn(Optional.empty());
 
         // Act
         Teacher result = teacherServiceUnderTest.findById(id);
 
         // Assert
-        assertThat(result).isEqualTo(null);
+        assertThat(result).isNull();
     }
 
 
+    @DisplayName("findById invalid test - should return null when ID is negative")
+    @Test
+    public void findById_shouldReturnNull_whenIdIsNegative() {
+        // Arrange
+        Long id = -1L;
+        when(teacherRepository.findById(id)).thenReturn(Optional.empty());
 
+        // Act
+        Teacher result = teacherServiceUnderTest.findById(id);
+
+        // Assert
+        assertThat(result).isNull();
+    }
 }

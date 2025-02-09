@@ -80,7 +80,6 @@ public class LoginRequestTest {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("user@example.com");
         loginRequest.setPassword("securepassword");
-
         assertEquals("user@example.com", loginRequest.getEmail());
         assertEquals("securepassword", loginRequest.getPassword());
     }

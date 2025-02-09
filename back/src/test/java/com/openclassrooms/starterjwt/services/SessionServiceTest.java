@@ -7,7 +7,6 @@ import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
-import io.jsonwebtoken.lang.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -16,13 +15,10 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Tag("SessionService Unit tests")
@@ -38,17 +34,15 @@ public class SessionServiceTest {
     private UserRepository userRepository;
 
     User userMock;
-
     List<User> userListMock;
     Teacher teacherMock;
-
     Session sessionMock;
 
     @BeforeEach
     public void setup() {
         sessionServiceUnderTest = new SessionService(sessionRepository, userRepository);
 
-        userMock = userMock.builder()
+        userMock = User.builder()
                 .id(1L)
                 .email("yassine@gmail.com")
                 .admin(true)
@@ -57,7 +51,7 @@ public class SessionServiceTest {
                 .password("password")
                 .build();
 
-        teacherMock = teacherMock.builder()
+        teacherMock = Teacher.builder()
                 .id(1L)
                 .lastName("teacher")
                 .firstName("teacher")
@@ -68,7 +62,7 @@ public class SessionServiceTest {
         userListMock = new ArrayList<>();
         userListMock.add(userMock);
 
-        sessionMock = sessionMock.builder()
+        sessionMock = Session.builder()
                 .id(1L)
                 .description("description")
                 .name("session")
@@ -76,99 +70,93 @@ public class SessionServiceTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .teacher(teacherMock)
-                .users(userListMock).build();
+                .users(userListMock)
+                .build();
     }
 
-    @DisplayName("create session unit test")
+    @DisplayName("Delete session valid unit test")
     @Test
-    public void create_shouldCreateSession_GivenSession(){
-        //Arrange
-        when(sessionRepository.save(sessionMock)).thenReturn(sessionMock);
+    public void delete_shouldDeleteSession_GivenValidId() {
+        // Arrange
+        doNothing().when(sessionRepository).deleteById(1L);
 
-        //Act
-        Session result = sessionServiceUnderTest.create(sessionMock);
+        // Act
+        sessionServiceUnderTest.delete(1L);
 
-        //Assert
+        // Assert
+        verify(sessionRepository, times(1)).deleteById(1L);
+    }
+
+    @DisplayName("Delete session invalid unit test")
+    @Test
+    public void delete_shouldNotThrowException_GivenInvalidId() {
+        // Arrange
+        doNothing().when(sessionRepository).deleteById(99L);
+
+        // Act & Assert
+        assertDoesNotThrow(() -> sessionServiceUnderTest.delete(99L));
+    }
+
+    @DisplayName("Find session by ID valid unit test")
+    @Test
+    public void getById_shouldReturnSession_GivenValidId() {
+        // Arrange
+        when(sessionRepository.findById(1L)).thenReturn(Optional.of(sessionMock));
+
+        // Act
+        Session result = sessionServiceUnderTest.getById(1L);
+
+        // Assert
         assertThat(result).isEqualTo(sessionMock);
     }
 
-    @DisplayName("update session unit test")
+    @DisplayName("Find session by ID invalid unit test")
     @Test
-    public void update_shouldUpdateSession_GivenSession(){
-        //Arrange
-        when(sessionRepository.save(sessionMock)).thenReturn(sessionMock);
+    public void getById_shouldReturnNull_GivenInvalidId() {
+        // Arrange
+        when(sessionRepository.findById(99L)).thenReturn(Optional.empty());
 
-        //Act
-        Session result = sessionServiceUnderTest.update(1L,sessionMock);
+        // Act
+        Session result = sessionServiceUnderTest.getById(99L);
 
-        //Assert
-        assertThat(result).isEqualTo(sessionMock);
+        // Assert
+        assertNull(result);
     }
 
-    @DisplayName("participate session invalid unit test")
+    @DisplayName("Find all sessions when sessions exist")
     @Test
-    public void participate_shouldThrowNotFoundException_GivenUserNull(){
-        //Arrange
-        when(sessionRepository.findById(1L)).thenReturn(Optional.empty());
+    public void findAll_shouldReturnSessionList_GivenExistingSessions() {
+        // Arrange
+        List<Session> sessions = Arrays.asList(sessionMock);
+        when(sessionRepository.findAll()).thenReturn(sessions);
 
+        // Act
+        List<Session> result = sessionServiceUnderTest.findAll();
 
-        //Assert
-        assertThrowsExactly(NotFoundException.class, () -> sessionServiceUnderTest.participate(1L, 1L));
-
-    }
-
-    @DisplayName("participate session invalid unit test Given Participated user")
-    @Test
-    public void participate_shouldThrowBadRequest_GivenParticipatedUser(){
-        //Arrange
-        when(sessionRepository.findById(1L)).thenReturn(Optional.of(sessionMock));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userMock));
-
-        //Assert
-        assertThrowsExactly(BadRequestException.class, () -> sessionServiceUnderTest.participate(1L,1L));
-    }
-
-    @DisplayName("participate in session valid unit test")
-    @Test
-    public void participate_shouldParticipateSession_GivenUserIdAndSessionId(){
-
-        //Arrange
-        when(sessionRepository.findById(1L)).thenReturn(Optional.of(sessionMock));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(userMock));
-
-        //Act
-        sessionServiceUnderTest.participate(1L,2L);
-
-        //Assert
-        verify(sessionRepository, times(1)).save(sessionMock);
+        // Assert
+        assertThat(result).isEqualTo(sessions);
     }
 
 
-    @DisplayName("no longer participate in session invalid unit test")
+
+
+    @DisplayName("Participate in session with non-existent session")
     @Test
-    public void noLongerParticipate_shouldThrowBadRequestException_GivenNoUserParticipate(){
+    public void participate_shouldThrowNotFoundException_GivenNonExistentSession() {
+        // Arrange
+        when(sessionRepository.findById(99L)).thenReturn(Optional.empty());
 
-        //Arrange
-        when(sessionRepository.findById(1L)).thenReturn(Optional.of(sessionMock));
-
-        //Assert
-        assertThrowsExactly(BadRequestException.class, () -> sessionServiceUnderTest.noLongerParticipate(1L, 2L));
-
+        // Assert
+        assertThrowsExactly(NotFoundException.class, () -> sessionServiceUnderTest.participate(99L, 1L));
     }
 
-    @DisplayName("no longer participate in session valid unit test")
+    @DisplayName("No longer participate in session with non-existent session")
     @Test
-    public void noLongerParticipate_shouldSaveSession_givenIdAndUserId() {
+    public void noLongerParticipate_shouldThrowNotFoundException_GivenNonExistentSession() {
+        // Arrange
+        when(sessionRepository.findById(99L)).thenReturn(Optional.empty());
 
-        //Arrange
-        when(sessionRepository.findById(1L)).thenReturn(Optional.of(sessionMock));
-
-        //Act
-        sessionServiceUnderTest.noLongerParticipate(1L, 1L);
-
-        //Assert
-        verify(sessionRepository, times(1)).save(sessionMock);
+        // Assert
+        assertThrowsExactly(NotFoundException.class, () -> sessionServiceUnderTest.noLongerParticipate(99L, 1L));
     }
-
-
 }

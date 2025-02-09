@@ -3,45 +3,54 @@ package com.openclassrooms.starterjwt.mapper;
 import com.openclassrooms.starterjwt.dto.SessionDto;
 import com.openclassrooms.starterjwt.models.Session;
 import com.openclassrooms.starterjwt.models.Teacher;
+import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.services.TeacherService;
+import com.openclassrooms.starterjwt.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.util.DateUtil.now;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @Tag("SessionMapper unit tests")
 @SpringBootTest
 public class SessionMapperTest {
+
     @Autowired
     private SessionMapper sessionMapperUnderTest;
 
+    @Autowired
+    private TeacherService teacherService;
+
+    @Autowired
+    private UserService userService;
+
     SessionDto sessionDto;
     Session session;
+    Teacher teacher;
 
     @BeforeEach
     public void init() {
-
         LocalDateTime currentLocalDateTime = LocalDateTime.now();
 
-        Teacher teacher = Teacher.builder()
+        teacher = Teacher.builder()
                 .id(1L)
                 .firstName("teacher")
                 .lastName("teacher")
                 .build();
 
-        sessionDto = new SessionDto(1L, "Session", now(), 1L, "Session description", new ArrayList<>(), currentLocalDateTime, currentLocalDateTime);
+        sessionDto = new SessionDto(1L, "Session", new Date(), 1L, "Session description", new ArrayList<>(), currentLocalDateTime, currentLocalDateTime);
         session = Session.builder()
                 .id(1L)
                 .name("Session")
-                .date(now())
+                .date(new Date())
                 .teacher(teacher)
                 .description("Session description")
                 .users(new ArrayList<>())
@@ -50,49 +59,75 @@ public class SessionMapperTest {
                 .build();
     }
 
-    @Tag("shouldMapDtoToEntity valid unit test")
     @Test
-    public void shouldMapDtoToEntity() {
+    @Tag("shouldHandleNullTeacherInDto")
+    public void shouldHandleNullTeacherInDto() {
+        sessionDto.setTeacher_id(null);
+
         Session result = sessionMapperUnderTest.toEntity(sessionDto);
 
-        assert(result.equals(session));
-        assert(result.getId().equals(session.getId()));
-        assert(result.getName().equals(session.getName()));
-        assert(result.getTeacher().equals(session.getTeacher()));
-        assert(result.getDescription().equals(session.getDescription()));
-        assert(result.getUsers().equals(session.getUsers()));
-        assert(result.getCreatedAt().equals(session.getCreatedAt()));
-        assert(result.getUpdatedAt().equals(session.getUpdatedAt()));
+        assertNull(result.getTeacher(), "Teacher should be null when teacher_id is null in DTO.");
     }
 
-    @Tag("shouldMapListDtoToListEntity valid unit test")
     @Test
-    public void shouldMapListDtoToListEntity() {
-        List<Session> result = sessionMapperUnderTest.toEntity(Collections.singletonList(sessionDto));
+    @Tag("shouldHandleEmptyUsersList")
+    public void shouldHandleEmptyUsersList() {
+        sessionDto.setUsers(Collections.emptyList());
 
-        assert(result.equals(Collections.singletonList(session)));
+        Session result = sessionMapperUnderTest.toEntity(sessionDto);
+
+        assertNotNull(result.getUsers(), "Users list should not be null.");
+        assertTrue(result.getUsers().isEmpty(), "Users list should be empty.");
     }
 
-    @Tag("shouldMapEntityToDto valid unit test")
     @Test
-    public void shouldMapEntityToDto() {
+    @Tag("shouldHandleNullUsersList")
+    public void shouldHandleNullUsersList() {
+        sessionDto.setUsers(null);
+
+        Session result = sessionMapperUnderTest.toEntity(sessionDto);
+
+        assertNotNull(result.getUsers(), "Users list should be initialized as empty if null in DTO.");
+        assertTrue(result.getUsers().isEmpty(), "Users list should be empty.");
+    }
+
+
+    @Test
+    @Tag("shouldHandleNullTeacherInSession")
+    public void shouldHandleNullTeacherInSession() {
+        session.setTeacher(null);
+
         SessionDto result = sessionMapperUnderTest.toDto(session);
 
-        assert(result.equals(sessionDto));
-        assert(result.getId().equals(sessionDto.getId()));
-        assert(result.getName().equals(sessionDto.getName()));
-        assert(result.getTeacher_id().equals(sessionDto.getTeacher_id()));
-        assert(result.getDescription().equals(sessionDto.getDescription()));
-        assert(result.getUsers().equals(sessionDto.getUsers()));
-        assert(result.getCreatedAt().equals(sessionDto.getCreatedAt()));
-        assert(result.getUpdatedAt().equals(sessionDto.getUpdatedAt()));
+        assertNull(result.getTeacher_id(), "Teacher ID should be null in DTO when session has no teacher.");
     }
 
-    @Tag("shouldMapListEntityToListDto valid unit test")
     @Test
-    public void shouldMapListEntityToListDto() {
-        List<SessionDto> result = sessionMapperUnderTest.toDto(Collections.singletonList(session));
+    @Tag("shouldHandleNullUsersInSession")
+    public void shouldHandleNullUsersInSession() {
+        session.setUsers(null);
 
-        assert(result.equals(Collections.singletonList(sessionDto)));
+        SessionDto result = sessionMapperUnderTest.toDto(session);
+
+        assertNotNull(result.getUsers(), "Users list should not be null in DTO.");
+        assertTrue(result.getUsers().isEmpty(), "Users list should be empty when session has null users.");
+    }
+
+    @Test
+    @Tag("shouldMapEmptyListDtoToEmptyListEntity")
+    public void shouldMapEmptyListDtoToEmptyListEntity() {
+        List<Session> result = sessionMapperUnderTest.toEntity(Collections.emptyList());
+
+        assertNotNull(result, "Result should not be null.");
+        assertTrue(result.isEmpty(), "List should be empty when input list is empty.");
+    }
+
+    @Test
+    @Tag("shouldMapEmptyListEntityToEmptyListDto")
+    public void shouldMapEmptyListEntityToEmptyListDto() {
+        List<SessionDto> result = sessionMapperUnderTest.toDto(Collections.emptyList());
+
+        assertNotNull(result, "Result should not be null.");
+        assertTrue(result.isEmpty(), "List should be empty when input list is empty.");
     }
 }

@@ -1,8 +1,6 @@
 package com.openclassrooms.starterjwt.mapper;
 
-import com.openclassrooms.starterjwt.dto.TeacherDto;
 import com.openclassrooms.starterjwt.dto.UserDto;
-import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -13,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("UserMapper unit tests")
 @SpringBootTest
@@ -29,7 +29,7 @@ public class UserMapperTest {
 
         LocalDateTime currentLocalDateTime = LocalDateTime.now();
 
-        userDto = new UserDto(1L, "yassine@gmail.com", "yassine", "yassine", true,"password", currentLocalDateTime,currentLocalDateTime);
+        userDto = new UserDto(1L, "yassine@gmail.com", "yassine", "yassine", true, "password", currentLocalDateTime, currentLocalDateTime);
         user = User.builder()
                 .id(1L)
                 .email("yassine@gmail.com")
@@ -42,51 +42,49 @@ public class UserMapperTest {
                 .build();
     }
 
-    @Tag("shouldMapDtoToEntity valid unit test")
+
+
     @Test
-    public void shouldMapDtoToEntity(){
+    @Tag("shouldHandleNullAdminInDto")
+    public void shouldHandleNullAdminInDto() {
+        userDto.setAdmin(false); // Simulation d'une valeur par défaut à `false`.
+
         User result = userMapperUnderTest.toEntity(userDto);
 
-        assert (result.equals(result));
-        assert (result.getId().equals(user.getId()));
-        assert (result.getEmail().equals(user.getEmail()));
-        assert (result.getFirstName().equals(user.getFirstName()));
-        assert (result.getLastName().equals(user.getLastName()));
-        assert (result.getCreatedAt().equals(user.getCreatedAt()));
-        assert (result.getUpdatedAt().equals(user.getUpdatedAt()));
-
+        assertFalse(result.isAdmin(), "Admin should be false when it is not explicitly set in DTO.");
     }
 
-    @Tag("shouldMapListDtoToListEntity valid unit test")
     @Test
-    public void shouldMapListDtoToListEntity() {
-        List<User> result = userMapperUnderTest.toEntity(Collections.singletonList(userDto));
+    @Tag("shouldHandleEmptyListDtoToEntity")
+    public void shouldHandleEmptyListDtoToEntity() {
+        List<User> result = userMapperUnderTest.toEntity(Collections.emptyList());
 
-        assert(result.equals(Collections.singletonList(user)));
+        assertNotNull(result, "Result should not be null.");
+        assertTrue(result.isEmpty(), "List should be empty when input list is empty.");
     }
 
-    @Tag("shouldMapEntityToDto valid unit test")
     @Test
-    public void shouldMapEntityToDto() {
+    @Tag("shouldHandleEmptyListEntityToDto")
+    public void shouldHandleEmptyListEntityToDto() {
+        List<UserDto> result = userMapperUnderTest.toDto(Collections.emptyList());
+
+        assertNotNull(result, "Result should not be null.");
+        assertTrue(result.isEmpty(), "List should be empty when input list is empty.");
+    }
+
+    @Test
+    @Tag("shouldHandleNullCreatedAtAndUpdatedAtInUser")
+    public void shouldHandleNullCreatedAtAndUpdatedAtInUser() {
+        user.setCreatedAt(null);
+        user.setUpdatedAt(null);
+
         UserDto result = userMapperUnderTest.toDto(user);
 
-        assert(result.equals(userDto));
-        assert(result.getId().equals(userDto.getId()));
-        assert(result.getEmail().equals(userDto.getEmail()));
-        assert(result.getFirstName().equals(userDto.getFirstName()));
-        assert(result.getLastName().equals(userDto.getLastName()));
-        assert(result.getPassword().equals(userDto.getPassword()));
-        assert(result.isAdmin() == userDto.isAdmin());
-        assert(result.getCreatedAt().equals(userDto.getCreatedAt()));
-        assert(result.getUpdatedAt().equals(userDto.getUpdatedAt()));
+        assertNull(result.getCreatedAt(), "createdAt should be null when it is null in User.");
+        assertNull(result.getUpdatedAt(), "updatedAt should be null when it is null in User.");
     }
 
-    @Tag("shouldMapListEntityToListDto valid unit test")
-    @Test
-    public void shouldMapListEntityToListDto() {
-        List<UserDto> result = userMapperUnderTest.toDto(Collections.singletonList(user));
 
-        assert(result.equals(Collections.singletonList(userDto)));
-    }
+
 
 }

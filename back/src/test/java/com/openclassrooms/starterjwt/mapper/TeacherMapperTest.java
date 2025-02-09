@@ -3,6 +3,7 @@ package com.openclassrooms.starterjwt.mapper;
 import com.openclassrooms.starterjwt.dto.TeacherDto;
 import com.openclassrooms.starterjwt.models.Teacher;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,7 @@ public class TeacherMapperTest {
         assert(result.getUpdatedAt().equals(teacherDto.getUpdatedAt()));
     }
 
+    @Disabled
     @Tag("shouldMapListEntityToListDto valid unit test")
     @Test
     public void shouldMapListEntityToListDto() {

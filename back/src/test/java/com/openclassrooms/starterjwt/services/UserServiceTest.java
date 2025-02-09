@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 @Tag("UserService Unit tests")
@@ -21,15 +22,15 @@ public class UserServiceTest {
     private UserService userServiceUnderTest;
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    User user;
+    private User user;
 
     @BeforeEach
     public void setup(){
         userServiceUnderTest = new UserService(userRepository);
 
-        user = user.builder()
+        user = User.builder()
                 .id(1L)
                 .email("yassine@gmail.com")
                 .admin(true)
@@ -41,7 +42,7 @@ public class UserServiceTest {
 
     @DisplayName("findUserById valid test")
     @Test
-    public void findById_shouldFindUser_givenId() {
+    public void findById_shouldFindUser_givenValidId() {
         // Arrange
         Long id = 1L;
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
@@ -53,23 +54,39 @@ public class UserServiceTest {
         assertThat(result).isEqualTo(user);
     }
 
-    @DisplayName("findUserById inValid test")
+    @DisplayName("findUserById invalid test")
     @Test
-    public void findById_shouldNotFindUser_givenInvalidId() {
+    public void findById_shouldReturnNull_givenInvalidId() {
         // Arrange
-        Long id = 0L;
+        Long id = 99L;
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
         // Act
         User result = userServiceUnderTest.findById(id);
 
         // Assert
-        assertThat(result).isEqualTo(null);
+        assertThat(result).isNull();
     }
 
-    @DisplayName("deleteById")
+
+
+    @DisplayName("findUserById with negative ID test")
     @Test
-    public void should_shouldDeleteUser_givenId() {
+    public void findById_shouldReturnNull_givenNegativeId() {
+        // Arrange
+        Long id = -1L;
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act
+        User result = userServiceUnderTest.findById(id);
+
+        // Assert
+        assertThat(result).isNull();
+    }
+
+    @DisplayName("deleteById valid test")
+    @Test
+    public void delete_shouldDeleteUser_givenValidId() {
         // Arrange
         Long id = 1L;
         doNothing().when(userRepository).deleteById(id);
@@ -81,7 +98,28 @@ public class UserServiceTest {
         verify(userRepository, times(1)).deleteById(id);
     }
 
+    @DisplayName("deleteById with invalid ID test")
+    @Test
+    public void delete_shouldNotThrowException_givenInvalidId() {
+        // Arrange
+        Long id = 99L;
+        doNothing().when(userRepository).deleteById(id);
+
+        // Act & Assert
+        assertDoesNotThrow(() -> userServiceUnderTest.delete(id));
+        verify(userRepository, times(1)).deleteById(id);
+    }
 
 
+    @DisplayName("deleteById with negative ID test")
+    @Test
+    public void delete_shouldNotThrowException_givenNegativeId() {
+        // Arrange
+        Long id = -1L;
+        doNothing().when(userRepository).deleteById(id);
 
+        // Act & Assert
+        assertDoesNotThrow(() -> userServiceUnderTest.delete(id));
+        verify(userRepository, times(1)).deleteById(id);
+    }
 }
