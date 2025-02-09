@@ -84,7 +84,7 @@ use maven with the following command: mvn clean test
 
 You can find the report in the target folder: target/site/jacoco/index.html by opening the index.html file in a browser.
 
-<img width="956" alt="image" src="https://github.com/user-attachments/assets/a6ca105b-046a-4bc8-9529-bef47cfe145b" />
+<img width="645" alt="image" src="https://github.com/user-attachments/assets/b32cf1a5-296e-4a72-be29-72c7fdc47eeb" />
 
 
 
